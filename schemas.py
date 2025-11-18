@@ -11,10 +11,10 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 
-# Example schemas (replace with your own):
+# Core app schemas
 
 class User(BaseModel):
     """
@@ -22,9 +22,9 @@ class User(BaseModel):
     Collection name: "user" (lowercase of class name)
     """
     name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
+    email: EmailStr = Field(..., description="Email address (unique)")
+    password_hash: str = Field(..., description="Hashed password (SHA-256)")
+    avatar: Optional[str] = Field(None, description="Optional avatar URL")
     is_active: bool = Field(True, description="Whether user is active")
 
 class Product(BaseModel):
@@ -38,11 +38,13 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Request models (not collections)
+class SignupRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class SigninRequest(BaseModel):
+    email: EmailStr
+    password: str
+
